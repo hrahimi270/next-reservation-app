@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { getServerAuthSession } from "@/server/auth";
-import { api } from "@/trpc/server";
 
 export default async function Home() {
   const session = await getServerAuthSession();
@@ -22,24 +21,5 @@ export default async function Home() {
         </div>
       </div>
     </main>
-  );
-}
-
-async function CrudShowcase() {
-  const session = await getServerAuthSession();
-  if (!session?.user) return null;
-
-  const latestReservation = await api.reservation.getLatest.query();
-
-  return (
-    <div className="w-full max-w-xs">
-      {latestReservation ? (
-        <p className="truncate">
-          Your most recent reservation: {latestReservation?.createdBy?.email}
-        </p>
-      ) : (
-        <p>You have no reservation yet.</p>
-      )}
-    </div>
   );
 }
