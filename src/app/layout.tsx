@@ -2,9 +2,9 @@ import "@/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
+import { redirect } from 'next/navigation'
 
 import { TRPCReactProvider } from "@/trpc/react";
-import AuthModal from "@/components/AuthModal";
 import { getServerAuthSession } from "@/server/auth";
 
 const inter = Inter({
@@ -24,11 +24,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerAuthSession();
+  if(!session?.user) {
+    redirect('/api/auth/signin')
+  }
   
   return (
     <html lang="en">
       <body className={`font-sans ${inter.variable} bg-blue-50`}>
-        {!session && <AuthModal />}
         <TRPCReactProvider cookies={cookies().toString()}>
           {children}
         </TRPCReactProvider>
