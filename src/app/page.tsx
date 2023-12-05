@@ -23,21 +23,11 @@ export default async function Home({
     : [];
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <div className="flex flex-col items-center gap-2">
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-center text-2xl">
-            <span>Logged in as {session?.user?.name}</span>
-          </p>
-          <Link
-            href="/api/auth/signout"
-            className="rounded-full bg-slate-200 px-10 py-3 font-semibold no-underline transition hover:bg-slate-400"
-          >
-            Sign out
-          </Link>
-          <CalendarWrapper user={session?.user} monthReservations={monthReservations} />
-        </div>
-      </div>
-    </main>
+    <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+        <CalendarWrapper
+          user={session?.user}
+          monthReservations={monthReservations}
+        />
+    </div>
   );
 }

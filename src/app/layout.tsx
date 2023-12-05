@@ -1,12 +1,13 @@
 import "@/styles/globals.css";
-import 'react-calendar/dist/Calendar.css';
+import "react-calendar/dist/Calendar.css";
 
 import { Inter } from "next/font/google";
 import { cookies } from "next/headers";
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { getServerAuthSession } from "@/server/auth";
+import Header from "@/components/Header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,16 +26,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerAuthSession();
-  if(!session?.user) {
-    redirect('/api/auth/signin')
+  if (!session?.user) {
+    redirect("/api/auth/signin");
   }
-  
+
   return (
     <html lang="en">
-      <body className={`font-sans ${inter.variable} bg-blue-50`}>
-        <TRPCReactProvider cookies={cookies().toString()}>
-          {children}
-        </TRPCReactProvider>
+      <body className={`font-sans ${inter.variable} bg-slate-100`}>
+        <main className="min-h-full">
+          <Header />
+          <TRPCReactProvider cookies={cookies().toString()}>
+            {children}
+          </TRPCReactProvider>
+        </main>
       </body>
     </html>
   );
