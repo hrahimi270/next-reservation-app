@@ -1,14 +1,21 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { Resevation } from "@prisma/client";
+import {
+  Resevation as PrismaResevation,
+  User as PrismaUser,
+} from "@prisma/client";
 import { User } from "next-auth";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Calendar from "react-calendar";
 
+interface Reservation extends PrismaResevation {
+  createdBy: PrismaUser;
+}
+
 interface CalendarWrapperProps {
-  monthReservations?: Resevation[];
+  monthReservations?: Reservation[];
   user?: User;
 }
 
@@ -46,6 +53,14 @@ export default function CalendarWrapper({
         new Date(reservation.reservedFrom).getDate() === value.getDate(),
     );
   }, [monthReservations, user, value]);
+
+  // list of reservations for the selected date
+  const selectedDateReservations = useMemo(() => {
+    return monthReservations?.filter(
+      (reservation) =>
+        new Date(reservation.reservedFrom).getDate() === value.getDate(),
+    );
+  }, [monthReservations, value]);
 
   useEffect(() => {
     if (value) {
@@ -86,7 +101,7 @@ export default function CalendarWrapper({
         );
 
         return isAvailable;
-      })
+      });
 
       setReservationDates(reservableDates);
     }
@@ -157,6 +172,28 @@ export default function CalendarWrapper({
         }}
       />
 
+      {selectedDateReservations?.length ? (
+        <div className="my-5 flex flex-col gap-5">
+          {selectedDateReservations.map((reservation) => {
+            return (
+              <div
+                key={reservation.id}
+                className="rounded-md border border-gray-200 p-5"
+              >
+                <span>{reservation.createdBy.name}</span> {" - "}
+                <span>
+                  {new Date(reservation.reservedFrom).toLocaleTimeString()}
+                </span>
+                {" to "}
+                <span>
+                  {new Date(reservation.reservedTo).toLocaleTimeString()}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+
       {userAlreadyReservedForSelectedDate ? (
         <p className="my-5 text-red-500">You already reserved on this day!</p>
       ) : null}
@@ -171,7 +208,7 @@ export default function CalendarWrapper({
           <option>select the from time</option>
           {reservationDates?.map((date) => {
             const isDateTomorrow = date.getDate() !== value.getDate();
-            const hour = date.toTimeString().slice(0, 5)
+            const hour = date.toTimeString().slice(0, 5);
 
             return (
               <option key={date.toISOString()} value={date.toISOString()}>
