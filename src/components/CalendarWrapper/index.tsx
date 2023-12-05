@@ -6,7 +6,7 @@ import {
   User as PrismaUser,
 } from "@prisma/client";
 import { User } from "next-auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Calendar from "react-calendar";
 
@@ -35,6 +35,15 @@ export default function CalendarWrapper({
 }: CalendarWrapperProps) {
   const router = useRouter();
 
+  // setting the active start date based on the url
+  const search = useSearchParams();
+  const startDateYear = search.get("year");
+  const startDateMonth = search.get("month");
+  const activeStartDate =
+    startDateYear && startDateMonth
+      ? new Date(Number(startDateYear), Number(startDateMonth) - 1, 1)
+      : new Date();
+
   const [value, onChange] = useState(new Date());
   const [reservationDates, setReservationDates] = useState<Date[]>();
   const [startReservationHour, setStartReservationHour] = useState<string>();
@@ -56,14 +65,16 @@ export default function CalendarWrapper({
 
   // disable reservation if there is no empty spots
   const noEmptySpotsLeft = useMemo(() => {
-    const selectedDateAvailableSpots = reservationDates?.filter((reservation) => {
-      return reservation.getDate() === value.getDate();
-    });
+    const selectedDateAvailableSpots = reservationDates?.filter(
+      (reservation) => {
+        return reservation.getDate() === value.getDate();
+      },
+    );
 
     return !selectedDateAvailableSpots?.length;
   }, [reservationDates, value]);
 
-  const isFormDisabled = userAlreadyReservedForSelectedDate || noEmptySpotsLeft;
+  const isFormDisabled = userAlreadyReservedForSelectedDate ?? noEmptySpotsLeft;
 
   // list of reservations for the selected date
   const selectedDateReservations = useMemo(() => {
@@ -162,16 +173,30 @@ export default function CalendarWrapper({
     );
   }
 
+  function onActiveStartDateChange(activeStartDate: Date | null) {
+    if (activeStartDate) {
+      router.push(
+        `/?year=${activeStartDate.getFullYear()}&month=${
+          activeStartDate.getMonth() + 1
+        }`,
+      );
+    }
+  }
+
   return (
     <Fragment>
       <Calendar
         onChange={(value) => onChange(value as Date)}
+        activeStartDate={activeStartDate}
+        onActiveStartDateChange={({ activeStartDate }) =>
+          onActiveStartDateChange(activeStartDate)
+        }
         value={value}
         minDate={new Date()}
-        tileDisabled={({ date }) =>
-          // disable weekends
-          date.getDay() === 6 || date.getDay() === 0
-        }
+        next2Label={null}
+        prev2Label={null}
+        // disable weekends
+        tileDisabled={({ date }) => date.getDay() === 6 || date.getDay() === 0}
         // green shade based on the number of reservations
         tileClassName={({ date }) => {
           const reservations = getReservationsForDay(date);
