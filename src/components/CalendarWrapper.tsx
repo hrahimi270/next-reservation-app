@@ -52,7 +52,6 @@ export default function CalendarWrapper({
       // setting the start to the selected day, 9 am
       const startReservationTime = new Date(value);
       startReservationTime.setHours(9, 0, 0, 0);
-      console.log(value.getDay());
 
       // setting the end date
       const endReservationTime = new Date(value);
@@ -72,7 +71,24 @@ export default function CalendarWrapper({
         startReservationTime.setHours(startReservationTime.getHours() + 1);
       }
 
-      setReservationDates(reservationDates);
+      // filter available hours by already reserved hours
+      const selectedDateReservations = monthReservations?.filter(
+        (reservation) =>
+          new Date(reservation.reservedFrom).getDate() === value.getDate(),
+      );
+      const reservableDates = reservationDates.filter((availableDate) => {
+        const isAvailable = selectedDateReservations?.every(
+          (reservation) =>
+            new Date(reservation.reservedFrom).getTime() !==
+              availableDate.getTime() &&
+            new Date(reservation.reservedTo).getTime() !==
+              availableDate.getTime(),
+        );
+
+        return isAvailable;
+      })
+
+      setReservationDates(reservableDates);
     }
   }, [value]);
 
@@ -154,23 +170,12 @@ export default function CalendarWrapper({
         >
           <option>select the from time</option>
           {reservationDates?.map((date) => {
-            const hour = date.toTimeString().slice(0, 5);
-
-            if (hour === "00:00") {
-              return (
-                <>
-                  <option key={date.toISOString()} value={date.toISOString()}>
-                    {hour}
-                  </option>
-                  <option key="tomorrow" disabled>
-                    --- tomorrow ---
-                  </option>
-                </>
-              );
-            }
+            const isDateTomorrow = date.getDate() !== value.getDate();
+            const hour = date.toTimeString().slice(0, 5)
 
             return (
               <option key={date.toISOString()} value={date.toISOString()}>
+                {isDateTomorrow ? "tomorrow " : null}
                 {hour}
               </option>
             );
@@ -193,26 +198,12 @@ export default function CalendarWrapper({
                   date.getTime() > new Date(startReservationHour).getTime(),
               )
               .map((date) => {
+                const isDateTomorrow = date.getDate() !== value.getDate();
                 const hour = date.toTimeString().slice(0, 5);
-
-                if (hour === "00:00") {
-                  return (
-                    <>
-                      <option
-                        key={date.toISOString()}
-                        value={date.toISOString()}
-                      >
-                        {hour}
-                      </option>
-                      <option key="tomorrow" disabled>
-                        --- tomorrow ---
-                      </option>
-                    </>
-                  );
-                }
 
                 return (
                   <option key={date.toISOString()} value={date.toISOString()}>
+                    {isDateTomorrow ? "tomorrow " : null}
                     {hour}
                   </option>
                 );
