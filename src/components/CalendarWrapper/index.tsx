@@ -9,6 +9,7 @@ import { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Calendar from "react-calendar";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 
 interface Reservation extends PrismaResevation {
   createdBy: PrismaUser;
@@ -187,12 +188,14 @@ export default function CalendarWrapper({
     <Fragment>
       <Calendar
         onChange={(value) => onChange(value as Date)}
+        value={value}
         activeStartDate={activeStartDate}
         onActiveStartDateChange={({ activeStartDate }) =>
           onActiveStartDateChange(activeStartDate)
         }
-        value={value}
         minDate={new Date()}
+        nextLabel={<FiChevronRight />}
+        prevLabel={<FiChevronLeft />}
         next2Label={null}
         prev2Label={null}
         // disable weekends

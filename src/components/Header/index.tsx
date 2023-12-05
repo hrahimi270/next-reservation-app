@@ -15,7 +15,7 @@ export default async function Header() {
             <img
               src={session.user.image}
               className="mr-3 inline-block h-8 w-8 rounded-full ring-2 ring-white"
-              alt={session?.user?.name || "User"}
+              alt={session?.user?.name ?? "User"}
             />
           ) : null}
           <span className="mr-2 text-sm text-gray-600">

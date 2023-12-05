@@ -24,10 +24,13 @@ export default async function Home({
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-        <CalendarWrapper
-          user={session?.user}
-          monthReservations={monthReservations}
-        />
+        <div className="flex">
+          <CalendarWrapper
+            user={session?.user}
+            monthReservations={monthReservations}
+          />
+          <div className="ml-4 grow bg-white p-5 rounded-md"></div>
+        </div>
     </div>
   );
 }

@@ -3,18 +3,50 @@
 @tailwind utilities;
 
 
+.react-calendar {
+    @apply rounded-md !border-none p-2
+}
+
+.react-calendar__navigation {
+    @apply !h-auto gap-3 items-center;
+}
+
+.react-calendar__navigation__arrow {
+    @apply !min-h-[35px] !min-w-[35px] flex items-center justify-center !bg-purple-500 rounded-md text-white;
+}
+
+.react-calendar__navigation__arrow:disabled {
+    @apply !bg-purple-300;
+}
+
+.react-calendar__navigation__label {
+    @apply py-3 hover:!bg-white focus:!bg-white;
+}
+
+.react-calendar__navigation__label__labelText {
+    @apply font-bold
+}
+
+.react-calendar__month-view__weekdays {
+    @apply bg-slate-200 rounded-2xl mb-3
+}
+
+.react-calendar__month-view__weekdays abbr {
+    @apply !no-underline;
+}
+
 .react-calendar__tile {
-    @apply !border-2 !border-solid !border-transparent;
+    @apply !border-2 !border-solid !border-transparent rounded;
 }
 
 .react-calendar__tile--active {
-    @apply !text-blue-400 !border-blue-400;
+    @apply !text-purple-400 !border-purple-400;
 }
 
 .react-calendar__tile:disabled {
-    @apply !bg-gray-100;
+    @apply !bg-white !text-slate-400;
 }
 
-.react-calendar__month-view__days__day--weekend {
-    @apply !text-red-500;
+.react-calendar__month-view__days__day--weekend abbr {
+    @apply !text-red-400;
 }
