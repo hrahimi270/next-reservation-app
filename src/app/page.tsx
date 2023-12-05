@@ -35,7 +35,7 @@ export default async function Home({
           >
             Sign out
           </Link>
-          <CalendarWrapper monthReservations={monthReservations} />
+          <CalendarWrapper user={session?.user} monthReservations={monthReservations} />
         </div>
       </div>
     </main>

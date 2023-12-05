@@ -2,12 +2,14 @@
 
 import { api } from "@/trpc/react";
 import { Resevation } from "@prisma/client";
+import { User } from "next-auth";
 import { useRouter } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Calendar from "react-calendar";
 
 interface CalendarWrapperProps {
   monthReservations?: Resevation[];
+  user?: User;
 }
 
 // !bg-green-100/50
@@ -20,14 +22,30 @@ interface CalendarWrapperProps {
 // !bg-green-800/50
 // !bg-green-900/50
 
-export default function CalendarWrapper(props: CalendarWrapperProps) {
+export default function CalendarWrapper({
+  monthReservations,
+  user,
+}: CalendarWrapperProps) {
   const router = useRouter();
+
   const [value, onChange] = useState(new Date());
   const [reservationDates, setReservationDates] = useState<Date[]>();
   const [startReservationHour, setStartReservationHour] = useState<string>();
   const [endReservationHour, setEndReservationHour] = useState<string>();
 
   const { mutate } = api.reservation.create.useMutation();
+
+  // disable reservation if the user already reserved once for the selected date
+  const userAlreadyReservedForSelectedDate = useMemo(() => {
+    const userReservations = monthReservations?.filter(
+      (reservation) => reservation.createdById === user?.id,
+    );
+
+    return userReservations?.some(
+      (reservation) =>
+        new Date(reservation.reservedFrom).getDate() === value.getDate(),
+    );
+  }, [monthReservations, user, value]);
 
   useEffect(() => {
     if (value) {
@@ -69,18 +87,21 @@ export default function CalendarWrapper(props: CalendarWrapperProps) {
       to: { value: string };
     };
 
-    mutate({
-      reservedFrom,
-      reservedTo,
-    }, {
-      onSuccess: () => {
-        router.refresh();
-      }
-    });
+    mutate(
+      {
+        reservedFrom,
+        reservedTo,
+      },
+      {
+        onSuccess: () => {
+          router.refresh();
+        },
+      },
+    );
   }
 
   function getReservationsForDay(date: Date) {
-    return props.monthReservations?.filter(
+    return monthReservations?.filter(
       (reservation) =>
         new Date(reservation.reservedFrom).getDate() === date.getDate(),
     );
@@ -91,14 +112,11 @@ export default function CalendarWrapper(props: CalendarWrapperProps) {
       <Calendar
         onChange={(value) => onChange(value as Date)}
         value={value}
-
         minDate={new Date()}
         tileDisabled={({ date }) =>
           // disable weekends
-          date.getDay() === 6 ||
-          date.getDay() === 0
+          date.getDay() === 6 || date.getDay() === 0
         }
-
         // green shade based on the number of reservations
         tileClassName={({ date }) => {
           const reservations = getReservationsForDay(date);
@@ -111,7 +129,6 @@ export default function CalendarWrapper(props: CalendarWrapperProps) {
 
           return ["group relative !text-slate-900", shade];
         }}
-
         // show the number of reservations on hover
         tileContent={({ date }) => {
           const reservations = getReservationsForDay(date);
@@ -124,11 +141,16 @@ export default function CalendarWrapper(props: CalendarWrapperProps) {
         }}
       />
 
+      {userAlreadyReservedForSelectedDate ? (
+        <p className="my-5 text-red-500">You already reserved on this day!</p>
+      ) : null}
+
       <form className="flex flex-col gap-5" onSubmit={handleFormSubmit}>
         <select
           name="from"
           onChange={(event) => setStartReservationHour(event.target.value)}
           value={startReservationHour}
+          disabled={userAlreadyReservedForSelectedDate}
         >
           <option>select the from time</option>
           {reservationDates?.map((date) => {
@@ -159,6 +181,7 @@ export default function CalendarWrapper(props: CalendarWrapperProps) {
           name="to"
           onChange={(event) => setEndReservationHour(event.target.value)}
           value={endReservationHour}
+          disabled={userAlreadyReservedForSelectedDate}
         >
           {!startReservationHour ? (
             <option>select the from time first</option>
@@ -197,7 +220,9 @@ export default function CalendarWrapper(props: CalendarWrapperProps) {
           )}
         </select>
 
-        <button type="submit">submit</button>
+        <button type="submit" disabled={userAlreadyReservedForSelectedDate}>
+          submit
+        </button>
       </form>
     </Fragment>
   );
