@@ -54,6 +54,17 @@ export default function CalendarWrapper({
     );
   }, [monthReservations, user, value]);
 
+  // disable reservation if there is no empty spots
+  const noEmptySpotsLeft = useMemo(() => {
+    const selectedDateAvailableSpots = reservationDates?.filter((reservation) => {
+      return reservation.getDate() === value.getDate();
+    });
+
+    return !selectedDateAvailableSpots?.length;
+  }, [reservationDates, value]);
+
+  const isFormDisabled = userAlreadyReservedForSelectedDate || noEmptySpotsLeft;
+
   // list of reservations for the selected date
   const selectedDateReservations = useMemo(() => {
     return monthReservations?.filter(
@@ -71,18 +82,18 @@ export default function CalendarWrapper({
       // setting the end date
       const endReservationTime = new Date(value);
       if (value.getDay() !== 5) {
-        // if the selected day is not friday, set the end date to tomorrow 11 am
+        // if the selected day is not friday, set the end date to tomorrow 10 am
         endReservationTime.setDate(value.getDate() + 1);
-        endReservationTime.setHours(11, 0, 0, 0);
+        endReservationTime.setHours(10, 0, 0, 0); // giving 1 hour for the last reservation
       } else {
-        // unless the selected day is friday, set the end to 5 pm
-        endReservationTime.setHours(17, 0, 0, 0);
+        // unless the selected day is friday, set the end to 4 pm
+        endReservationTime.setHours(16, 0, 0, 0); // giving 1 hour for the last reservation
       }
 
       // list of available reservation dates (hours) for the selected date to multiplication of 1 hour
-      const reservationDates = [];
+      const availableReservationDates: Date[] = [];
       while (startReservationTime <= endReservationTime) {
-        reservationDates.push(new Date(startReservationTime));
+        availableReservationDates.push(new Date(startReservationTime));
         startReservationTime.setHours(startReservationTime.getHours() + 1);
       }
 
@@ -91,17 +102,30 @@ export default function CalendarWrapper({
         (reservation) =>
           new Date(reservation.reservedFrom).getDate() === value.getDate(),
       );
-      const reservableDates = reservationDates.filter((availableDate) => {
-        const isAvailable = selectedDateReservations?.every(
-          (reservation) =>
-            new Date(reservation.reservedFrom).getTime() !==
-              availableDate.getTime() &&
-            new Date(reservation.reservedTo).getTime() !==
-              availableDate.getTime(),
-        );
+      const reservableDates = availableReservationDates.filter(
+        (availableDate) => {
+          const availableDateTime = availableDate.getTime();
+          const availableDateClone = new Date(availableDateTime);
+          availableDateClone.setHours(availableDateClone.getHours() + 1);
+          const availableDateTimePlusOneHour = availableDateClone.getTime();
 
-        return isAvailable;
-      });
+          const isDateReserved = selectedDateReservations?.filter(
+            (reservation) => {
+              const reservationFrom = reservation.reservedFrom.getTime();
+              const reservationTo = reservation.reservedTo.getTime();
+
+              return (
+                (availableDateTime >= reservationFrom &&
+                  availableDateTime <= reservationTo) ||
+                (availableDateTimePlusOneHour >= reservationFrom &&
+                  availableDateTimePlusOneHour <= reservationTo)
+              );
+            },
+          );
+
+          return !isDateReserved?.length;
+        },
+      );
 
       setReservationDates(reservableDates);
     }
@@ -195,7 +219,15 @@ export default function CalendarWrapper({
       ) : null}
 
       {userAlreadyReservedForSelectedDate ? (
-        <p className="my-5 text-red-500">You already reserved on this day!</p>
+        <p className="mb-1 mt-3 text-red-500">
+          You already reserved on this day!
+        </p>
+      ) : null}
+
+      {noEmptySpotsLeft ? (
+        <p className="mb-1 mt-3 text-red-500">
+          There are no empty spost for the selected day!
+        </p>
       ) : null}
 
       <form className="flex flex-col gap-5" onSubmit={handleFormSubmit}>
@@ -203,16 +235,17 @@ export default function CalendarWrapper({
           name="from"
           onChange={(event) => setStartReservationHour(event.target.value)}
           value={startReservationHour}
-          disabled={userAlreadyReservedForSelectedDate}
+          disabled={isFormDisabled}
         >
           <option>select the from time</option>
           {reservationDates?.map((date) => {
             const isDateTomorrow = date.getDate() !== value.getDate();
             const hour = date.toTimeString().slice(0, 5);
 
+            if (isDateTomorrow) return null;
+
             return (
               <option key={date.toISOString()} value={date.toISOString()}>
-                {isDateTomorrow ? "tomorrow " : null}
                 {hour}
               </option>
             );
@@ -223,7 +256,7 @@ export default function CalendarWrapper({
           name="to"
           onChange={(event) => setEndReservationHour(event.target.value)}
           value={endReservationHour}
-          disabled={userAlreadyReservedForSelectedDate}
+          disabled={isFormDisabled}
         >
           {!startReservationHour ? (
             <option>select the from time first</option>
@@ -248,7 +281,7 @@ export default function CalendarWrapper({
           )}
         </select>
 
-        <button type="submit" disabled={userAlreadyReservedForSelectedDate}>
+        <button type="submit" disabled={isFormDisabled}>
           submit
         </button>
       </form>
