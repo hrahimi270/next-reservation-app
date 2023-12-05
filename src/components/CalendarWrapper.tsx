@@ -224,7 +224,7 @@ export default function CalendarWrapper({
         </p>
       ) : null}
 
-      {noEmptySpotsLeft ? (
+      {!userAlreadyReservedForSelectedDate && noEmptySpotsLeft ? (
         <p className="mb-1 mt-3 text-red-500">
           There are no empty spost for the selected day!
         </p>
