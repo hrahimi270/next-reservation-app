@@ -2,7 +2,7 @@
 
 import { MonthReservation, generateCalendarTileShader } from "@/lib";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Calendar, { TileArgs, OnArgs } from "react-calendar";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import TileContent from "../TileContent";
@@ -63,6 +63,20 @@ export default function CalendarWrapper({
       );
     }
   }
+
+  useEffect(() => {
+    // prefetch next month
+    const nextMonthNumber =
+      activeStartDate.getMonth() === 11 ? 0 : activeStartDate.getMonth() + 1;
+    const nextMonth = new Date(
+      activeStartDate.getFullYear(),
+      nextMonthNumber,
+      1,
+    );
+    router.prefetch(
+      `/?year=${nextMonth.getFullYear()}&month=${nextMonth.getMonth() + 1}`,
+    );
+  }, [activeStartDate]);
 
   return (
     <Calendar
