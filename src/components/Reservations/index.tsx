@@ -20,7 +20,7 @@ export default function Reservations({ monthReservations }: ReservationsProps) {
   }, [monthReservations, selectedDate]);
 
   return (
-    <div className="relative ml-4 flex h-[325px] max-h-[325px] grow flex-col overflow-y-auto rounded-md bg-white p-6">
+    <div className="relative ml-0 mt-3 sm:mt-0 sm:ml-4 flex h-[325px] max-h-[325px] grow flex-col overflow-y-auto rounded-md bg-white p-6">
       {selectedDateReservations?.length ? (
         selectedDateReservations.map((reservation) => {
           return (

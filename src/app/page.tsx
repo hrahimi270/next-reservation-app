@@ -30,7 +30,7 @@ export default async function Home({
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-      <div className="mb-4 flex">
+      <div className="mb-4 flex flex-col items-center px-8 sm:px-0 sm:flex-row">
         {/* Using <Suspense>, we are streaming our client components */}
         <Suspense>
           <CalendarWrapper monthReservations={monthReservations} />

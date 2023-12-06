@@ -122,7 +122,7 @@ export default function ReservationForm({
   return (
     <form
       onSubmit={handleFormSubmit}
-      className="grid grid-cols-1 gap-x-6 gap-y-4 rounded-md bg-white p-6 sm:grid-cols-6"
+      className="grid grid-cols-1 gap-x-6 gap-y-4 px-8 sm:px-0 rounded-md bg-white p-6 sm:grid-cols-6"
     >
       {/* Let user know they cannot reserve for this date */}
       <AlreadyReservedMessage show={isUserAlreadyReservedForDate} />
