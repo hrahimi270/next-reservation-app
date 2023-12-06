@@ -18,10 +18,13 @@ export default async function Home({
   const currentMonth = currentDate.getMonth() + 1;
 
   // getting the year and month from the URL as a persitent state
+  const yearFromURL = Number(searchParams.year) || currentYear;
+  const monthFromURL = Number(searchParams.month) || currentMonth;
+
   const monthReservations = session?.user
     ? await api.reservation.getMonthReservations.query({
-        year: Number(searchParams.year) || currentYear,
-        month: Number(searchParams.month) || currentMonth,
+        year: yearFromURL,
+        month: monthFromURL,
       })
     : [];
 
