@@ -30,7 +30,8 @@ export default function ReservationForm({
   monthReservations,
   user,
 }: ReservationFormProps) {
-  const selectedDate = useReservationStore((state) => state.selectedDate)
+  const selectedDate = useReservationStore((state) => state.selectedDate);
+
   const [availableReservations, setAvailableReservations] = useState<Date[]>();
   const [startReservationHour, setStartReservationHour] = useState<string>();
 
@@ -120,6 +121,7 @@ export default function ReservationForm({
         show={!isUserAlreadyReservedForDate && noEmptySpotsLeft}
       />
 
+      {/* reservation `name` field which is filled by default because we have users signed-in */}
       {user?.name ? (
         <div className="sm:col-span-1">
           <div className="mt-2">
@@ -128,6 +130,7 @@ export default function ReservationForm({
         </div>
       ) : null}
 
+      {/* reservation `from` field */}
       <div className="sm:col-span-2">
         <div className="mt-2">
           <Select
@@ -137,11 +140,13 @@ export default function ReservationForm({
             disabled={isFormDisabled}
           >
             <option>When do you want to reserve?</option>
-            {availableReservations?.map((date) => {
+            {availableReservations?.map((date, index) => {
               const isDateTomorrow = date.getDate() !== selectedDate.getDate();
+              const isLastItem = index === availableReservations.length - 1;
               const hour = date.toTimeString().slice(0, 5);
 
-              if (isDateTomorrow) return null;
+              // we are removing the last item in the array, so users have 1 hour left, to reserve
+              if (isDateTomorrow || isLastItem) return null;
 
               return (
                 <option key={date.toISOString()} value={date.toISOString()}>
@@ -153,6 +158,7 @@ export default function ReservationForm({
         </div>
       </div>
 
+      {/* reservation `to` field */}
       <div className="sm:col-span-2">
         <div className="mt-2">
           <Select name="to" disabled={isFormDisabled}>

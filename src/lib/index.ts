@@ -50,10 +50,10 @@ export const getStartAndEndOfReservationForDate = (date: Date) => {
   if (date.getDay() !== 5) {
     // if the selected day is not friday, set the end date to tomorrow 10 am
     endReservationTime.setDate(date.getDate() + 1);
-    endReservationTime.setHours(10, 0, 0, 0); // giving 1 hour for the last reservation
+    endReservationTime.setHours(11, 0, 0, 0); // giving 1 hour for the last reservation
   } else {
     // unless the selected day is friday, set the end to 4 pm
-    endReservationTime.setHours(16, 0, 0, 0); // giving 1 hour for the last reservation
+    endReservationTime.setHours(17, 0, 0, 0); // giving 1 hour for the last reservation
   }
 
   return { startReservationTime, endReservationTime };
