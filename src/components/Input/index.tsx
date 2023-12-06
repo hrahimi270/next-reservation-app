@@ -2,9 +2,7 @@
 
 import { useId } from "react";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
-
-export default function Input({ type = "text", ...rest }: InputProps) {
+export default function Input({ type = "text", ...rest }: React.InputHTMLAttributes<HTMLInputElement>) {
   const id = useId();
 
   return (

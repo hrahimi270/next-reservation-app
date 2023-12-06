@@ -125,7 +125,7 @@ export default function ReservationForm({
         show={!isUserAlreadyReservedForDate && noEmptySpotsLeft}
       />
 
-      {user && user?.name ? (
+      {user?.name ? (
         <div className="sm:col-span-1">
           <div className="mt-2">
             <Input name="name" defaultValue={user.name} disabled />

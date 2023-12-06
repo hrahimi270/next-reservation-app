@@ -62,9 +62,9 @@ export default function CalendarWrapper({
 
   return (
     <Calendar
-      onChange={(value) => {
+      onChange={async (value) => {
+        await setSelectedDate(value as Date);
         onChange(value as Date);
-        setSelectedDate(value as Date);
       }}
       value={value}
       activeStartDate={activeStartDate}
