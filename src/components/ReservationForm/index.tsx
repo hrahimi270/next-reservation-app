@@ -10,6 +10,7 @@ import {
   MonthReservation,
   filterAvailableReservationHours,
   generateAvailableHours,
+  getMonthReservationsEndingOnSelectedDate,
   getMonthReservationsForDate,
   getStartAndEndOfReservationForDate,
   hasAnyEmptySpotLeftForDate,
@@ -74,10 +75,20 @@ export default function ReservationForm({
         selectedDate,
       );
 
+      /**
+       * get all reservations for the previous day of the selected date,
+       * that are ending on the selected date (their `reservedTo` is set to the selected date)
+       */
+      const reservationsForPreviousDate = getMonthReservationsEndingOnSelectedDate(
+        monthReservations,
+        selectedDate
+      )
+
       // filter available reservation hours for the selected date
       const reservableDates = filterAvailableReservationHours(
         availableReservationDates,
         reservationsForDate,
+        reservationsForPreviousDate
       );
 
       setAvailableReservations(reservableDates);

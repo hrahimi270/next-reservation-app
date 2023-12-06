@@ -79,35 +79,66 @@ export const getMonthReservationsForDate = (
   );
 };
 
+export const getMonthReservationsEndingOnSelectedDate = (
+  monthReservations: MonthReservation[] | undefined,
+  date: Date,
+) => {
+  return monthReservations?.filter(
+    (reservation) =>
+      // theses reservations are ending on the selected date but started the day before
+      new Date(reservation.reservedFrom).getDate() === date.getDate() - 1 &&
+      new Date(reservation.reservedTo).getDate() === date.getDate(),
+  );
+};
+
 export const filterAvailableReservationHours = (
   availableReservationDates: Date[],
   reservationsForDate: MonthReservation[] | undefined,
+  reservationsEndingOnDate: MonthReservation[] | undefined,
 ) => {
-  return availableReservationDates.filter((availableDate) => {
-    const availableDateTime = availableDate.getTime();
-    const availableDateClone = new Date(availableDateTime);
-    availableDateClone.setHours(availableDateClone.getHours() + 1);
-    const availableDateTimePlusOneHour = availableDateClone.getTime();
+  return availableReservationDates
+    .filter((availableDate) => {
+      const availableDateTime = availableDate.getTime();
+      const availableDateClone = new Date(availableDateTime);
+      availableDateClone.setHours(availableDateClone.getHours() + 1);
+      const availableDateTimePlusOneHour = availableDateClone.getTime();
 
-    const isDateReserved = reservationsForDate?.filter((reservation) => {
-      const reservationFrom = reservation.reservedFrom.getTime();
-      const reservationTo = reservation.reservedTo.getTime();
+      const isDateReserved = reservationsForDate?.filter((reservation) => {
+        const reservationFrom = reservation.reservedFrom.getTime();
+        const reservationTo = reservation.reservedTo.getTime();
 
-      /**
-       * if the available hours is between the reservation `from` and `to`,
-       * or if the available hours plus one hour is between the reservation `from` and `to`,
-       * then the date is reserved
-       */
-      return (
-        (availableDateTime >= reservationFrom &&
-          availableDateTime <= reservationTo) ||
-        (availableDateTimePlusOneHour >= reservationFrom &&
-          availableDateTimePlusOneHour <= reservationTo)
+        /**
+         * if the available hours is between the reservation `from` and `to`,
+         * or if the available hours plus one hour is between the reservation `from` and `to`,
+         * then the date is reserved
+         */
+        return (
+          (availableDateTime >= reservationFrom &&
+            availableDateTime <= reservationTo) ||
+          (availableDateTimePlusOneHour >= reservationFrom &&
+            availableDateTimePlusOneHour <= reservationTo)
+        );
+      });
+
+      return !isDateReserved?.length;
+    })
+    .filter((availableDate) => {
+      const availableDateTime = availableDate.getTime();
+
+      const isDateReservedByBeforeDay = reservationsEndingOnDate?.filter(
+        (reservation) => {
+          const reservationTo = reservation.reservedTo.getTime();
+
+          /**
+           * if the previous day had a reservation that is ending on the selected date (today),
+           * we must consider that the selected date is reserved and filter it out
+           */
+          return availableDateTime <= reservationTo;
+        },
       );
-    });
 
-    return !isDateReserved?.length;
-  });
+      return !isDateReservedByBeforeDay?.length;
+    });
 };
 
 export const generateCalendarTileShader = (
