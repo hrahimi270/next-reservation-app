@@ -6,7 +6,6 @@ import Input from "../Input";
 import Select from "../Select";
 
 import { useEffect, useMemo, useState } from "react";
-import { parseAsIsoDateTime, useQueryState } from "next-usequerystate";
 import {
   MonthReservation,
   filterAvailableReservationHours,
@@ -20,6 +19,7 @@ import AlreadyReservedMessage from "../AlreadyReservedMessage";
 import NoMoreSpotsMessage from "../NoMoreSpotsMessage";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";
+import { useReservationStore } from "@/store/useReservationStore";
 
 interface ReservationFormProps {
   monthReservations?: MonthReservation[];
@@ -30,12 +30,7 @@ export default function ReservationForm({
   monthReservations,
   user,
 }: ReservationFormProps) {
-  // get selected date by user from the URL
-  const [selectedDate] = useQueryState(
-    "selectedDate",
-    parseAsIsoDateTime.withDefault(new Date()),
-  );
-
+  const selectedDate = useReservationStore((state) => state.selectedDate)
   const [availableReservations, setAvailableReservations] = useState<Date[]>();
   const [startReservationHour, setStartReservationHour] = useState<string>();
 

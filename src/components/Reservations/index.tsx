@@ -1,20 +1,15 @@
 "use client";
 
-import { useQueryState } from "next-usequerystate";
-import { parseAsIsoDateTime } from "next-usequerystate/parsers";
-
 import { useMemo } from "react";
 import { MonthReservation } from "@/lib";
+import { useReservationStore } from "@/store/useReservationStore";
 
 interface ReservationsProps {
   monthReservations?: MonthReservation[]
 }
 
 export default function Reservations({ monthReservations }: ReservationsProps) {
-  const [selectedDate] = useQueryState(
-    "selectedDate",
-    parseAsIsoDateTime.withDefault(new Date()),
-  );
+  const selectedDate = useReservationStore((state) => state.selectedDate)
 
   const selectedDateReservations = useMemo(() => {
     return monthReservations?.filter(

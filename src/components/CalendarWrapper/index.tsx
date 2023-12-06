@@ -1,12 +1,12 @@
 "use client";
 
 import { MonthReservation, generateCalendarTileShader } from "@/lib";
-import { parseAsIsoDateTime, useQueryState } from "next-usequerystate";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Calendar, { TileArgs, OnArgs } from "react-calendar";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import TileContent from "../TileContent";
+import { useReservationStore } from "@/store/useReservationStore";
 
 interface CalendarWrapperProps {
   monthReservations?: MonthReservation[];
@@ -28,12 +28,8 @@ export default function CalendarWrapper({
       : new Date();
   }, [search]);
 
-  const [, setSelectedDate] = useQueryState(
-    "selectedDate",
-    parseAsIsoDateTime.withDefault(new Date()),
-  );
-
-  const [value, onChange] = useState(new Date());
+  const selectedDate = useReservationStore((state) => state.selectedDate)
+  const setSelectedDate = useReservationStore((state) => state.setSelectedDate)
 
   function getReservationsForDay(date: Date) {
     return monthReservations?.filter(
@@ -70,10 +66,9 @@ export default function CalendarWrapper({
   return (
     <Calendar
       onChange={async (value) => {
-        onChange(value as Date);
-        await setSelectedDate(value as Date); // setting the date state to URL params
+        setSelectedDate(value as Date);
       }}
-      value={value}
+      value={selectedDate}
       activeStartDate={activeStartDate}
       onActiveStartDateChange={onActiveStartDateChange}
       nextLabel={<FiChevronRight />}
