@@ -92,11 +92,13 @@ export default function ReservationForm({
         show={!isUserAlreadyReservedForDate && noEmptySpotsLeft}
       />
 
-      <div className="sm:col-span-1">
-        <div className="mt-2">
-          <Input name="name" placeholder="Your name" disabled />
+      {user && user?.name ? (
+        <div className="sm:col-span-1">
+          <div className="mt-2">
+            <Input name="name" defaultValue={user.name} disabled />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="sm:col-span-2">
         <div className="mt-2">
