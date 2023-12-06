@@ -26,15 +26,15 @@ export default function Reservations({ monthReservations }: ReservationsProps) {
           return (
             <div
               key={reservation.id}
-              className="mb-4 rounded-md border border-gray-200 p-3"
+              className="mb-3 rounded-md border border-gray-200 p-3"
             >
-              <span className="font-bold">{reservation.createdBy.name}</span>{" "}
-              {" - "}
-              <span className="text-slate-500">
+              <span className="font-bold mr-2">{reservation.createdBy.name}</span>
+              {"-"}
+              <span className="text-slate-500 mx-2">
                 {new Date(reservation.reservedFrom).toLocaleTimeString()}
               </span>
-              {" to "}
-              <span className="text-slate-500">
+              {"to"}
+              <span className="text-slate-500 ml-2">
                 {new Date(reservation.reservedTo).toLocaleTimeString()}
               </span>
             </div>
