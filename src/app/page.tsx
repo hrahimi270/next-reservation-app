@@ -11,10 +11,12 @@ export default async function Home({
 }) {
   const session = await getServerAuthSession();
 
+  // fallback to empty state of url params
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth() + 1;
 
+  // getting the year and month from the URL as a persitent state
   const monthReservations = session?.user
     ? await api.reservation.getMonthReservations.query({
         year: Number(searchParams.year) || currentYear,
