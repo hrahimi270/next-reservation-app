@@ -18,6 +18,8 @@ import {
 } from "@/lib";
 import AlreadyReservedMessage from "../AlreadyReservedMessage";
 import NoMoreSpotsMessage from "../NoMoreSpotsMessage";
+import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
 
 interface ReservationFormProps {
   monthReservations?: MonthReservation[];
@@ -35,6 +37,10 @@ export default function ReservationForm({
   );
 
   const [availableReservations, setAvailableReservations] = useState<Date[]>();
+  const [startReservationHour, setStartReservationHour] = useState<string>();
+
+  const router = useRouter();
+  const { mutate } = api.reservation.create.useMutation();
 
   // check if user has already reserved for the selected date
   const isUserAlreadyReservedForDate = useMemo(() => {
@@ -82,8 +88,35 @@ export default function ReservationForm({
     }
   }, [selectedDate]);
 
+  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const {
+      from: { value: reservedFrom },
+      to: { value: reservedTo },
+    } = event.target as unknown as {
+      from: { value: string };
+      to: { value: string };
+    };
+
+    mutate(
+      {
+        reservedFrom,
+        reservedTo,
+      },
+      {
+        onSuccess: () => {
+          router.refresh();
+        },
+      },
+    );
+  }
+
   return (
-    <form className="grid grid-cols-1 gap-x-6 gap-y-4 rounded-md bg-white p-6 sm:grid-cols-6">
+    <form
+      onSubmit={handleFormSubmit}
+      className="grid grid-cols-1 gap-x-6 gap-y-4 rounded-md bg-white p-6 sm:grid-cols-6"
+    >
       {/* Let user know they cannot reserve for this date */}
       <AlreadyReservedMessage show={isUserAlreadyReservedForDate} />
 
@@ -102,8 +135,25 @@ export default function ReservationForm({
 
       <div className="sm:col-span-2">
         <div className="mt-2">
-          <Select name="from" disabled={isFormDisabled}>
-            <option>hi</option>
+          <Select
+            name="from"
+            onChange={(event) => setStartReservationHour(event.target.value)}
+            value={startReservationHour}
+            disabled={isFormDisabled}
+          >
+            <option>When do you want to reserve?</option>
+            {availableReservations?.map((date) => {
+              const isDateTomorrow = date.getDate() !== selectedDate.getDate();
+              const hour = date.toTimeString().slice(0, 5);
+
+              if (isDateTomorrow) return null;
+
+              return (
+                <option key={date.toISOString()} value={date.toISOString()}>
+                  {hour}
+                </option>
+              );
+            })}
           </Select>
         </div>
       </div>
@@ -111,7 +161,28 @@ export default function ReservationForm({
       <div className="sm:col-span-2">
         <div className="mt-2">
           <Select name="to" disabled={isFormDisabled}>
-            <option>hi</option>
+            {!startReservationHour ? (
+              <option>Select the start time first</option>
+            ) : (
+              // filter the reservation dates to be after the selected start time
+              availableReservations
+                ?.filter(
+                  (date) =>
+                    date.getTime() > new Date(startReservationHour).getTime(),
+                )
+                .map((date) => {
+                  const isDateTomorrow =
+                    date.getDate() !== selectedDate.getDate();
+                  const hour = date.toTimeString().slice(0, 5);
+
+                  return (
+                    <option key={date.toISOString()} value={date.toISOString()}>
+                      {isDateTomorrow ? "tomorrow " : null}
+                      {hour}
+                    </option>
+                  );
+                })
+            )}
           </Select>
         </div>
       </div>
