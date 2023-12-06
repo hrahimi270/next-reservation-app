@@ -16,6 +16,8 @@ import {
   hasAnyEmptySpotLeftForDate,
   userHasAlreadyReservedForDate,
 } from "@/lib";
+import AlreadyReservedMessage from "../AlreadyReservedMessage";
+import NoMoreSpotsMessage from "../NoMoreSpotsMessage";
 
 interface ReservationFormProps {
   monthReservations?: MonthReservation[];
@@ -83,21 +85,12 @@ export default function ReservationForm({
   return (
     <form className="grid grid-cols-1 gap-x-6 gap-y-4 rounded-md bg-white p-6 sm:grid-cols-6">
       {/* Let user know they cannot reserve for this date */}
-      {isUserAlreadyReservedForDate ? (
-        <div className="mb-3 sm:col-span-full">
-          <p className="mb-1 mt-3 text-red-500">
-            You've already reserved your spot on this day!
-          </p>
-        </div>
-      ) : null}
+      <AlreadyReservedMessage show={isUserAlreadyReservedForDate} />
 
-      {!isUserAlreadyReservedForDate && noEmptySpotsLeft ? (
-        <div className="mb-3 sm:col-span-full">
-          <p className="mb-1 mt-3 text-red-500">
-            There are no empty spost for the selected day!
-          </p>
-        </div>
-      ) : null}
+      {/* Let user know there are not more spots left for this date */}
+      <NoMoreSpotsMessage
+        show={!isUserAlreadyReservedForDate && noEmptySpotsLeft}
+      />
 
       <div className="sm:col-span-1">
         <div className="mt-2">
