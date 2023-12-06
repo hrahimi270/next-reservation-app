@@ -39,8 +39,13 @@
     @apply !border-2 !border-solid !border-transparent rounded;
 }
 
+.react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus {
+    @apply !bg-slate-50;
+
+}
+
 .react-calendar__tile--active {
-    @apply !text-purple-400 !border-purple-400;
+    @apply !text-purple-400 !border-purple-400 !bg-white;
 }
 
 .react-calendar__tile:disabled {
