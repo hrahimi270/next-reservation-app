@@ -28,14 +28,15 @@ export default function CalendarWrapper({
       : new Date();
   }, [search]);
 
-  const selectedDate = useReservationStore((state) => state.selectedDate)
-  const setSelectedDate = useReservationStore((state) => state.setSelectedDate)
+  const selectedDate = useReservationStore((state) => state.selectedDate);
+  const setSelectedDate = useReservationStore((state) => state.setSelectedDate);
 
   function getReservationsForDay(date: Date) {
-    return monthReservations?.filter(
-      (reservation) =>
-        new Date(reservation.reservedFrom).getDate() === date.getDate(),
-    );
+    return monthReservations?.filter((reservation) => {
+      const reservedFrom = new Date(reservation.reservedFrom).setHours(0, 0, 0);
+      const calendarDate = new Date(date).setHours(0, 0, 0);
+      return reservedFrom === calendarDate;
+    });
   }
 
   function getTileClassNames({ date }: TileArgs) {
