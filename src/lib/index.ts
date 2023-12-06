@@ -109,3 +109,17 @@ export const filterAvailableReservationHours = (
     return !isDateReserved?.length;
   });
 };
+
+export const generateCalendarTileShader = (
+  reservationsLength: number | undefined,
+) => {
+  let shade = "!bg-white";
+
+  if (reservationsLength && reservationsLength <= 9) {
+    shade = `!bg-green-${reservationsLength * 100}/50`;
+  } else if (reservationsLength && reservationsLength > 9) {
+    shade = "!bg-green-900/75";
+  }
+
+  return ["group relative !text-slate-900", shade];
+};

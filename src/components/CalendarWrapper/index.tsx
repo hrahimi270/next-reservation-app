@@ -1,10 +1,10 @@
 "use client";
 
-import { MonthReservation } from "@/lib";
+import { MonthReservation, generateCalendarTileShader } from "@/lib";
 import { parseAsIsoDateTime, useQueryState } from "next-usequerystate";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import Calendar from "react-calendar";
+import Calendar, { TileArgs } from "react-calendar";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 
 interface CalendarWrapperProps {
@@ -41,13 +41,19 @@ export default function CalendarWrapper({
   );
 
   const [value, onChange] = useState(new Date());
-  const [reservationDates, setReservationDates] = useState<Date[]>();
 
   function getReservationsForDay(date: Date) {
     return monthReservations?.filter(
       (reservation) =>
         new Date(reservation.reservedFrom).getDate() === date.getDate(),
     );
+  }
+
+  function getTileClassNames({ date }: TileArgs) {
+    const reservations = getReservationsForDay(date);
+    const classNames = generateCalendarTileShader(reservations?.length);
+
+    return [...classNames];
   }
 
   function onActiveStartDateChange(activeStartDate: Date | null) {
@@ -63,8 +69,8 @@ export default function CalendarWrapper({
   return (
     <Calendar
       onChange={async (value) => {
-        await setSelectedDate(value as Date);
         onChange(value as Date);
+        await setSelectedDate(value as Date); // setting the date state to URL params
       }}
       value={value}
       activeStartDate={activeStartDate}
@@ -79,17 +85,7 @@ export default function CalendarWrapper({
       // disable weekends
       tileDisabled={({ date }) => date.getDay() === 6 || date.getDay() === 0}
       // green shade based on the number of reservations
-      tileClassName={({ date }) => {
-        const reservations = getReservationsForDay(date);
-        const shade =
-          reservations?.length && reservations?.length <= 9
-            ? `!bg-green-${reservations.length * 100}/50`
-            : reservations?.length && reservations?.length > 9
-              ? "!bg-green-900/75"
-              : "!bg-white";
-
-        return ["group relative !text-slate-900", shade];
-      }}
+      tileClassName={getTileClassNames}
       // show the number of reservations on hover
       tileContent={({ date }) => {
         const reservations = getReservationsForDay(date);
