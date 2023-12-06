@@ -1,28 +1,19 @@
-# Create T3 App
+# Reservation App
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Reservation app created with Next.js, Prisma, tRPC, Tailwind, and Next-auth.
 
-## What's next? How do I make an app with this?
+## How to run the project?
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+First of all, you have to make a copy of the `.env.example` file and name it to `.env`.
+Then, create another copy of the `/var/.env.example` file and name it to `.env` inside the `var` folder. This file will be holding Postgres variables that will be used for the development.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+Now, you should give a correct value to the `DATABASE_URL` variable so the Prisma connect to that database.
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+Also create a secret for the `NEXTAUTH_SECRET` variable using this command in your terminal:
+```sh
+openssl rand -base64 32
+```
 
-## Learn More
+After that, you have to create an Discord Application with your personal account, and set the client id and client secret to `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` variables.
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
-
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
-
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
-
-## How do I deploy this?
-
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+Now you are good to go. Run the app and enjoy!
