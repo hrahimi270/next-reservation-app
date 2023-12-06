@@ -2,6 +2,7 @@ import { getServerAuthSession } from "@/server/auth";
 import { api } from "@/trpc/server";
 import CalendarWrapper from "@/components/CalendarWrapper";
 import Reservations from "@/components/Reservations";
+import ReservationForm from "@/components/ReservationForm";
 
 export default async function Home({
   searchParams,
@@ -23,13 +24,16 @@ export default async function Home({
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-      <div className="flex">
+      <div className="flex mb-4">
         <CalendarWrapper
           user={session?.user}
           monthReservations={monthReservations}
         />
+
         <Reservations monthReservations={monthReservations} />
       </div>
+
+      <ReservationForm user={session?.user} monthReservations={monthReservations} />
     </div>
   );
 }
