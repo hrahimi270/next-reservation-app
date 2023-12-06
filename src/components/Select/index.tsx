@@ -13,7 +13,7 @@ export default function Select({ children, ...rest }: SelectProps) {
     <select
       id={id}
       {...rest}
-      className="block w-full rounded-md border-0 px-2 py-2 text-gray-900 shadow-sm outline-none ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+      className="block w-full rounded-md border-0 px-2 py-2 text-gray-900 shadow-sm outline-none ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:bg-slate-100 disabled:cursor-not-allowed"
     >
       {children}
     </select>
