@@ -3,7 +3,7 @@
 import { MonthReservation, generateCalendarTileShader } from "@/lib";
 import { parseAsIsoDateTime, useQueryState } from "next-usequerystate";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Calendar, { TileArgs, OnArgs } from "react-calendar";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import TileContent from "../TileContent";
@@ -19,12 +19,14 @@ export default function CalendarWrapper({
 
   // setting the active start date based on the url
   const search = useSearchParams();
-  const startDateYear = search.get("year");
-  const startDateMonth = search.get("month");
-  const activeStartDate =
-    startDateYear && startDateMonth
+  const activeStartDate = useMemo(() => {
+    const startDateYear = search.get("year");
+    const startDateMonth = search.get("month");
+
+    return startDateYear && startDateMonth
       ? new Date(Number(startDateYear), Number(startDateMonth) - 1, 1)
       : new Date();
+  }, [search]);
 
   const [, setSelectedDate] = useQueryState(
     "selectedDate",
