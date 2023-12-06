@@ -37,7 +37,7 @@ export default function ReservationForm({
   const [startReservationHour, setStartReservationHour] = useState<string>();
 
   const router = useRouter();
-  const { mutate } = api.reservation.create.useMutation();
+  const { mutate, isLoading } = api.reservation.create.useMutation();
 
   // check if user has already reserved for the selected date
   const isUserAlreadyReservedForDate = useMemo(() => {
@@ -54,7 +54,7 @@ export default function ReservationForm({
   }, [availableReservations, selectedDate]);
 
   // is the reservation form disabled?
-  const isFormDisabled = isUserAlreadyReservedForDate ?? noEmptySpotsLeft;
+  const isFormDisabled = isLoading ?? isUserAlreadyReservedForDate ?? noEmptySpotsLeft;
 
   // calculate available reservation dates for the selected date
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function ReservationForm({
   return (
     <form
       onSubmit={handleFormSubmit}
-      className="grid grid-cols-1 gap-x-6 gap-y-4 px-8 sm:px-0 rounded-md bg-white p-6 sm:grid-cols-6"
+      className="grid grid-cols-1 gap-x-6 gap-y-4 px-8 sm:px-6 py-6 rounded-md bg-white sm:grid-cols-6"
     >
       {/* Let user know they cannot reserve for this date */}
       <AlreadyReservedMessage show={isUserAlreadyReservedForDate} />
@@ -202,7 +202,7 @@ export default function ReservationForm({
       <div className="sm:col-span-1">
         <div className="mt-2">
           <Button type="submit" disabled={isFormDisabled}>
-            Reserve
+            {isLoading ? "Reserving..." : "Reserve"}
           </Button>
         </div>
       </div>
