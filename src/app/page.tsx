@@ -3,6 +3,7 @@ import { api } from "@/trpc/server";
 import CalendarWrapper from "@/components/CalendarWrapper";
 import Reservations from "@/components/Reservations";
 import ReservationForm from "@/components/ReservationForm";
+import { Suspense } from "react";
 
 export default async function Home({
   searchParams,
@@ -27,14 +28,20 @@ export default async function Home({
   return (
     <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
       <div className="mb-4 flex">
-        <CalendarWrapper monthReservations={monthReservations} />
-        <Reservations monthReservations={monthReservations} />
+        {/* Using <Suspense>, we are streaming our client components */}
+        <Suspense>
+          <CalendarWrapper monthReservations={monthReservations} />
+          <Reservations monthReservations={monthReservations} />
+        </Suspense>
       </div>
 
-      <ReservationForm
-        user={session?.user}
-        monthReservations={monthReservations}
-      />
+      {/* Using <Suspense>, we are streaming our client components */}
+      <Suspense>
+        <ReservationForm
+          user={session?.user}
+          monthReservations={monthReservations}
+        />
+      </Suspense>
     </div>
   );
 }
