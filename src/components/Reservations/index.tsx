@@ -3,18 +3,11 @@
 import { useQueryState } from "next-usequerystate";
 import { parseAsIsoDateTime } from "next-usequerystate/parsers";
 
-import {
-  Resevation as PrismaResevation,
-  User as PrismaUser,
-} from "@prisma/client";
 import { useMemo } from "react";
-
-interface Reservation extends PrismaResevation {
-  createdBy: PrismaUser;
-}
+import { MonthReservation } from "@/lib";
 
 interface ReservationsProps {
-  monthReservations?: Reservation[];
+  monthReservations?: MonthReservation[]
 }
 
 export default function Reservations({ monthReservations }: ReservationsProps) {

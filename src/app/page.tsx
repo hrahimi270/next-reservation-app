@@ -24,16 +24,15 @@ export default async function Home({
 
   return (
     <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-      <div className="flex mb-4">
-        <CalendarWrapper
-          user={session?.user}
-          monthReservations={monthReservations}
-        />
-
+      <div className="mb-4 flex">
+        <CalendarWrapper monthReservations={monthReservations} />
         <Reservations monthReservations={monthReservations} />
       </div>
 
-      <ReservationForm user={session?.user} monthReservations={monthReservations} />
+      <ReservationForm
+        user={session?.user}
+        monthReservations={monthReservations}
+      />
     </div>
   );
 }
